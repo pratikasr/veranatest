@@ -2,6 +2,8 @@ package app
 
 import (
 	"time"
+	_ "veranatest/x/td/module"
+	tdmoduletypes "veranatest/x/td/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
@@ -130,6 +132,7 @@ var (
 						// ibc modules
 						ibcexported.ModuleName,
 						// chain modules
+						tdmoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/beginBlockers
 					},
 					EndBlockers: []string{
@@ -139,6 +142,7 @@ var (
 						group.ModuleName,
 						protocolpooltypes.ModuleName, // ADD THIS
 						// chain modules
+						tdmoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
 					// The following is mostly only needed when ModuleName != StoreKey name.
@@ -176,6 +180,7 @@ var (
 						ibctransfertypes.ModuleName,
 						icatypes.ModuleName,
 						// chain modules
+						tdmoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 					ExportGenesis: []string{
@@ -302,6 +307,10 @@ var (
 			{
 				Name:   protocolpooltypes.ModuleName,
 				Config: appconfig.WrapAny(&protocolpoolmodulev1.Module{}),
+			},
+			{
+				Name:   tdmoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&tdmoduletypes.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

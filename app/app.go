@@ -47,6 +47,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 
 	"veranatest/docs"
+	tdmodulekeeper "veranatest/x/td/keeper"
 )
 
 const (
@@ -99,6 +100,7 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
+	TdKeeper tdmodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -179,6 +181,7 @@ func New(
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
 		&app.ProtocolPoolKeeper,
+		&app.TdKeeper,
 	); err != nil {
 		panic(err)
 	}
