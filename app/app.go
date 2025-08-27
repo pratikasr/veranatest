@@ -38,6 +38,7 @@ import (
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	protocolpoolkeeper "github.com/cosmos/cosmos-sdk/x/protocolpool/keeper"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/controller/keeper"
@@ -90,6 +91,7 @@ type App struct {
 	ConsensusParamsKeeper consensuskeeper.Keeper
 	CircuitBreakerKeeper  circuitkeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
+	ProtocolPoolKeeper    protocolpoolkeeper.Keeper
 
 	// ibc keepers
 	IBCKeeper           *ibckeeper.Keeper
@@ -176,6 +178,7 @@ func New(
 		&app.ConsensusParamsKeeper,
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
+		&app.ProtocolPoolKeeper,
 	); err != nil {
 		panic(err)
 	}

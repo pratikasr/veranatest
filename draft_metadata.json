@@ -1,0 +1,10 @@
+{
+ "title": "send continuous funds to the community pool operator account cosmos14gqluqwmanzrm9q47dunxd99tt9yrklfntsjfq",
+ "authors": [
+  "pratikasr"
+ ],
+ "summary": "to send the amount to the given address for distributing yield to the trust deposit holders",
+ "details": "By this proposal we intend to have an extra yield for the trust deposit holders via the comunnity pool.",
+ "proposal_forum_url": "https://discussions.verana.io/proposal-1",
+ "vote_option_context": "yes, no, abstain"
+}

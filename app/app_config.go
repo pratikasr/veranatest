@@ -20,6 +20,7 @@ import (
 	mintmodulev1 "cosmossdk.io/api/cosmos/mint/module/v1"
 	nftmodulev1 "cosmossdk.io/api/cosmos/nft/module/v1"
 	paramsmodulev1 "cosmossdk.io/api/cosmos/params/module/v1"
+	protocolpoolmodulev1 "cosmossdk.io/api/cosmos/protocolpool/module/v1" // ADD THIS
 	slashingmodulev1 "cosmossdk.io/api/cosmos/slashing/module/v1"
 	stakingmodulev1 "cosmossdk.io/api/cosmos/staking/module/v1"
 	txconfigv1 "cosmossdk.io/api/cosmos/tx/config/v1"
@@ -60,7 +61,9 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	_ "github.com/cosmos/cosmos-sdk/x/params" // import for side-effects
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	_ "github.com/cosmos/cosmos-sdk/x/slashing" // import for side-effects
+	_ "github.com/cosmos/cosmos-sdk/x/protocolpool"                       // import for side-effects - ADD THIS
+	protocolpooltypes "github.com/cosmos/cosmos-sdk/x/protocolpool/types" // ADD THIS
+	_ "github.com/cosmos/cosmos-sdk/x/slashing"                           // import for side-effects
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	_ "github.com/cosmos/cosmos-sdk/x/staking" // import for side-effects
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -81,6 +84,8 @@ var (
 		{Account: nft.ModuleName},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
+		{Account: protocolpooltypes.ModuleName},                // ADD THIS
+		{Account: protocolpooltypes.ProtocolPoolEscrowAccount}, // ADD THIS
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -121,6 +126,7 @@ var (
 						stakingtypes.ModuleName,
 						authz.ModuleName,
 						epochstypes.ModuleName,
+						protocolpooltypes.ModuleName, // ADD THIS - must come AFTER distribution
 						// ibc modules
 						ibcexported.ModuleName,
 						// chain modules
@@ -131,6 +137,7 @@ var (
 						stakingtypes.ModuleName,
 						feegrant.ModuleName,
 						group.ModuleName,
+						protocolpooltypes.ModuleName, // ADD THIS
 						// chain modules
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
@@ -163,6 +170,34 @@ var (
 						upgradetypes.ModuleName,
 						circuittypes.ModuleName,
 						epochstypes.ModuleName,
+						protocolpooltypes.ModuleName, // ADD THIS
+						// ibc modules
+						ibcexported.ModuleName,
+						ibctransfertypes.ModuleName,
+						icatypes.ModuleName,
+						// chain modules
+						// this line is used by starport scaffolding # stargate/app/initGenesis
+					},
+					ExportGenesis: []string{
+						consensustypes.ModuleName,
+						authtypes.ModuleName,
+						banktypes.ModuleName,
+						distrtypes.ModuleName,
+						stakingtypes.ModuleName,
+						slashingtypes.ModuleName,
+						govtypes.ModuleName,
+						minttypes.ModuleName,
+						genutiltypes.ModuleName,
+						evidencetypes.ModuleName,
+						authz.ModuleName,
+						feegrant.ModuleName,
+						vestingtypes.ModuleName,
+						nft.ModuleName,
+						group.ModuleName,
+						upgradetypes.ModuleName,
+						circuittypes.ModuleName,
+						epochstypes.ModuleName,
+						protocolpooltypes.ModuleName, // ADD THIS - must be exported before bank
 						// ibc modules
 						ibcexported.ModuleName,
 						ibctransfertypes.ModuleName,
@@ -263,6 +298,10 @@ var (
 			{
 				Name:   epochstypes.ModuleName,
 				Config: appconfig.WrapAny(&epochsmodulev1.Module{}),
+			},
+			{
+				Name:   protocolpooltypes.ModuleName,
+				Config: appconfig.WrapAny(&protocolpoolmodulev1.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},
