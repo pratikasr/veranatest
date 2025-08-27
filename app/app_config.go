@@ -86,8 +86,9 @@ var (
 		{Account: nft.ModuleName},
 		{Account: ibctransfertypes.ModuleName, Permissions: []string{authtypes.Minter, authtypes.Burner}},
 		{Account: icatypes.ModuleName},
-		{Account: protocolpooltypes.ModuleName},                // ADD THIS
-		{Account: protocolpooltypes.ProtocolPoolEscrowAccount}, // ADD THIS
+		{Account: protocolpooltypes.ModuleName},
+		{Account: protocolpooltypes.ProtocolPoolEscrowAccount},
+		{Account: tdmoduletypes.ModuleName},
 		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 
@@ -208,6 +209,7 @@ var (
 						ibctransfertypes.ModuleName,
 						icatypes.ModuleName,
 						// chain modules
+						tdmoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 				}),
