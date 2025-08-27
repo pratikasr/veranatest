@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package veranatest.td.v1;
 
 import "amino/amino.proto";
@@ -10,4 +11,5 @@ option go_package = "veranatest/x/td/types";
 message Params {
   option (amino.name) = "veranatest/x/td/Params";
   option (gogoproto.equal) = true;
+  uint64 trust_deposit_share_value = 1;
 }
