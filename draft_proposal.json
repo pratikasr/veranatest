@@ -3,14 +3,14 @@
   {
    "@type": "/cosmos.protocolpool.v1.MsgCreateContinuousFund",
    "authority": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
-   "recipient": "cosmos14gqluqwmanzrm9q47dunxd99tt9yrklfntsjfq",
+   "recipient": "cosmos1xr7fuv6kcgfzw9mct8lj3v2y2fkehjheqqpza6",
    "percentage": "0.500000000000000000",
    "expiry": null
   }
  ],
  "metadata": "ipfs://CID",
  "deposit": "10000000uvna",
- "title": "send continuous funds to the community pool operator account cosmos14gqluqwmanzrm9q47dunxd99tt9yrklfntsjfq",
+ "title": "send continuous funds to the community pool operator account cosmos1xr7fuv6kcgfzw9mct8lj3v2y2fkehjheqqpza6 (td module account)",
  "summary": "to send the amount to the given address for distributing yield to the trust deposit holders",
  "expedited": false
 }
