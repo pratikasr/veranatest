@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -17,6 +18,12 @@ func (k msgServer) FundModule(ctx context.Context, msg *types.MsgFundModule) (*t
 	senderAcc, _ := sdk.AccAddressFromBech32(msg.Creator)
 
 	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAcc, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uvna", sdkmath.NewInt(msg.Amount))))
+	if err != nil {
+		return nil, err
+	}
+	params, _ := k.Params.Get(ctx)
+	params.TrustDepositShareValue = params.TrustDepositShareValue + uint64(msg.Amount)
+	err = k.Params.Set(ctx, params)
 	if err != nil {
 		return nil, err
 	}

@@ -12,4 +12,5 @@ message Params {
   option (amino.name) = "veranatest/x/td/Params";
   option (gogoproto.equal) = true;
   uint64 trust_deposit_share_value = 1;
+  uint64 trust_deposit_value = 2;
 }
