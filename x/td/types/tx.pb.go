@@ -35,8 +35,6 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgUpdateParams struct {
 	// authority is the address that controls the module (defaults to x/gov unless overwritten).
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
-	// params defines the module parameters to update.
-	//
 	// NOTE: All parameters must be supplied.
 	Params Params `protobuf:"bytes,2,opt,name=params,proto3" json:"params"`
 }
@@ -126,15 +124,107 @@ func (m *MsgUpdateParamsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 
+// MsgFundModule defines the MsgFundModule message.
+type MsgFundModule struct {
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	Amount  int64  `protobuf:"varint,2,opt,name=amount,proto3" json:"amount,omitempty"`
+}
+
+func (m *MsgFundModule) Reset()         { *m = MsgFundModule{} }
+func (m *MsgFundModule) String() string { return proto.CompactTextString(m) }
+func (*MsgFundModule) ProtoMessage()    {}
+func (*MsgFundModule) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3ad71b4b0e957e5, []int{2}
+}
+func (m *MsgFundModule) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgFundModule) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgFundModule.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgFundModule) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFundModule.Merge(m, src)
+}
+func (m *MsgFundModule) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgFundModule) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFundModule.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgFundModule proto.InternalMessageInfo
+
+func (m *MsgFundModule) GetCreator() string {
+	if m != nil {
+		return m.Creator
+	}
+	return ""
+}
+
+func (m *MsgFundModule) GetAmount() int64 {
+	if m != nil {
+		return m.Amount
+	}
+	return 0
+}
+
+// MsgFundModuleResponse defines the MsgFundModuleResponse message.
+type MsgFundModuleResponse struct {
+}
+
+func (m *MsgFundModuleResponse) Reset()         { *m = MsgFundModuleResponse{} }
+func (m *MsgFundModuleResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgFundModuleResponse) ProtoMessage()    {}
+func (*MsgFundModuleResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c3ad71b4b0e957e5, []int{3}
+}
+func (m *MsgFundModuleResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgFundModuleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgFundModuleResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgFundModuleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgFundModuleResponse.Merge(m, src)
+}
+func (m *MsgFundModuleResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgFundModuleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgFundModuleResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgFundModuleResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgUpdateParams)(nil), "veranatest.td.v1.MsgUpdateParams")
 	proto.RegisterType((*MsgUpdateParamsResponse)(nil), "veranatest.td.v1.MsgUpdateParamsResponse")
+	proto.RegisterType((*MsgFundModule)(nil), "veranatest.td.v1.MsgFundModule")
+	proto.RegisterType((*MsgFundModuleResponse)(nil), "veranatest.td.v1.MsgFundModuleResponse")
 }
 
 func init() { proto.RegisterFile("veranatest/td/v1/tx.proto", fileDescriptor_c3ad71b4b0e957e5) }
 
 var fileDescriptor_c3ad71b4b0e957e5 = []byte{
-	// 327 bytes of a gzipped FileDescriptorProto
+	// 410 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2c, 0x4b, 0x2d, 0x4a,
 	0xcc, 0x4b, 0x2c, 0x49, 0x2d, 0x2e, 0xd1, 0x2f, 0x49, 0xd1, 0x2f, 0x33, 0xd4, 0x2f, 0xa9, 0xd0,
 	0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0x12, 0x40, 0x48, 0xe9, 0x95, 0xa4, 0xe8, 0x95, 0x19, 0x4a,
@@ -150,12 +240,17 @@ var fileDescriptor_c3ad71b4b0e957e5 = []byte{
 	0x13, 0xf7, 0xe4, 0x19, 0x56, 0x3c, 0xdf, 0xa0, 0xc5, 0x18, 0x04, 0xd5, 0x62, 0x65, 0xd4, 0xf4,
 	0x7c, 0x83, 0x16, 0xc2, 0xb0, 0xae, 0xe7, 0x1b, 0xb4, 0xe4, 0x91, 0x9c, 0x5e, 0x01, 0x72, 0x3c,
 	0x9a, 0x43, 0x95, 0x24, 0xb9, 0xc4, 0xd1, 0x84, 0x82, 0x52, 0x8b, 0x0b, 0xf2, 0xf3, 0x8a, 0x53,
-	0x8d, 0xb2, 0xb8, 0x98, 0x7d, 0x8b, 0xd3, 0x85, 0x62, 0xb8, 0x78, 0x50, 0xbc, 0xa6, 0x88, 0xe9,
-	0x24, 0x34, 0x13, 0xa4, 0x34, 0x09, 0x2a, 0x81, 0x59, 0x22, 0xc5, 0xda, 0x00, 0xf2, 0x82, 0x93,
-	0xfe, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe1, 0xb1,
-	0x1c, 0xc3, 0x85, 0xc7, 0x72, 0x0c, 0x37, 0x1e, 0xcb, 0x31, 0x44, 0x89, 0xa2, 0xfb, 0xa0, 0xa4,
-	0xb2, 0x20, 0xb5, 0x38, 0x89, 0x0d, 0x1c, 0xf6, 0xc6, 0x80, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd5,
-	0x5d, 0xff, 0x99, 0x26, 0x02, 0x00, 0x00,
+	0x95, 0x32, 0xb9, 0x78, 0x7d, 0x8b, 0xd3, 0xdd, 0x4a, 0xf3, 0x52, 0x7c, 0xf3, 0x53, 0x4a, 0x73,
+	0x52, 0x85, 0x8c, 0xb8, 0xd8, 0x93, 0x8b, 0x52, 0x13, 0x4b, 0xf2, 0x8b, 0x08, 0x7a, 0x09, 0xa6,
+	0x50, 0x48, 0x8c, 0x8b, 0x2d, 0x31, 0x37, 0xbf, 0x34, 0xaf, 0x04, 0xec, 0x21, 0xe6, 0x20, 0x28,
+	0xcf, 0x8a, 0x07, 0xe4, 0x56, 0x98, 0x2a, 0x25, 0x71, 0x2e, 0x51, 0x14, 0xab, 0x60, 0x6e, 0x30,
+	0x3a, 0xc4, 0xc8, 0xc5, 0xec, 0x5b, 0x9c, 0x2e, 0x14, 0xc3, 0xc5, 0x83, 0x12, 0xbe, 0x8a, 0x98,
+	0xe1, 0x82, 0xe6, 0x0d, 0x29, 0x4d, 0x82, 0x4a, 0x60, 0xb6, 0x08, 0x85, 0x71, 0x71, 0x21, 0x79,
+	0x53, 0x1e, 0xab, 0x46, 0x84, 0x02, 0x29, 0x75, 0x02, 0x0a, 0x60, 0xe6, 0x4a, 0xb1, 0x36, 0x80,
+	0xe2, 0xc7, 0x49, 0xff, 0xc4, 0x23, 0x39, 0xc6, 0x0b, 0x8f, 0xe4, 0x18, 0x1f, 0x3c, 0x92, 0x63,
+	0x9c, 0xf0, 0x58, 0x8e, 0xe1, 0xc2, 0x63, 0x39, 0x86, 0x1b, 0x8f, 0xe5, 0x18, 0xa2, 0x44, 0xd1,
+	0xa3, 0xa7, 0xa4, 0xb2, 0x20, 0xb5, 0x38, 0x89, 0x0d, 0x9c, 0xb0, 0x8c, 0x01, 0x01, 0x00, 0x00,
+	0xff, 0xff, 0x48, 0x1e, 0xa8, 0xde, 0x03, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -173,6 +268,8 @@ type MsgClient interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(ctx context.Context, in *MsgUpdateParams, opts ...grpc.CallOption) (*MsgUpdateParamsResponse, error)
+	// FundModule defines the FundModule RPC.
+	FundModule(ctx context.Context, in *MsgFundModule, opts ...grpc.CallOption) (*MsgFundModuleResponse, error)
 }
 
 type msgClient struct {
@@ -192,11 +289,22 @@ func (c *msgClient) UpdateParams(ctx context.Context, in *MsgUpdateParams, opts 
 	return out, nil
 }
 
+func (c *msgClient) FundModule(ctx context.Context, in *MsgFundModule, opts ...grpc.CallOption) (*MsgFundModuleResponse, error) {
+	out := new(MsgFundModuleResponse)
+	err := c.cc.Invoke(ctx, "/veranatest.td.v1.Msg/FundModule", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// UpdateParams defines a (governance) operation for updating the module
 	// parameters. The authority defaults to the x/gov module account.
 	UpdateParams(context.Context, *MsgUpdateParams) (*MsgUpdateParamsResponse, error)
+	// FundModule defines the FundModule RPC.
+	FundModule(context.Context, *MsgFundModule) (*MsgFundModuleResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -205,6 +313,9 @@ type UnimplementedMsgServer struct {
 
 func (*UnimplementedMsgServer) UpdateParams(ctx context.Context, req *MsgUpdateParams) (*MsgUpdateParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateParams not implemented")
+}
+func (*UnimplementedMsgServer) FundModule(ctx context.Context, req *MsgFundModule) (*MsgFundModuleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FundModule not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -229,6 +340,24 @@ func _Msg_UpdateParams_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_FundModule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgFundModule)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).FundModule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/veranatest.td.v1.Msg/FundModule",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).FundModule(ctx, req.(*MsgFundModule))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var Msg_serviceDesc = _Msg_serviceDesc
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "veranatest.td.v1.Msg",
@@ -237,6 +366,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateParams",
 			Handler:    _Msg_UpdateParams_Handler,
+		},
+		{
+			MethodName: "FundModule",
+			Handler:    _Msg_FundModule_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -306,6 +439,64 @@ func (m *MsgUpdateParamsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgFundModule) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgFundModule) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgFundModule) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Amount != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Amount))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Creator) > 0 {
+		i -= len(m.Creator)
+		copy(dAtA[i:], m.Creator)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.Creator)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgFundModuleResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgFundModuleResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgFundModuleResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -333,6 +524,31 @@ func (m *MsgUpdateParams) Size() (n int) {
 }
 
 func (m *MsgUpdateParamsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgFundModule) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Creator)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Amount != 0 {
+		n += 1 + sovTx(uint64(m.Amount))
+	}
+	return n
+}
+
+func (m *MsgFundModuleResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -489,6 +705,157 @@ func (m *MsgUpdateParamsResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgUpdateParamsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgFundModule) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgFundModule: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgFundModule: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Creator", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Creator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			m.Amount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Amount |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgFundModuleResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgFundModuleResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgFundModuleResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:
