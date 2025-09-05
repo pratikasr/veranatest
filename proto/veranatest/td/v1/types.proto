@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package veranatest.td.v1;
+
+import "amino/amino.proto";
+import "cosmos/msg/v1/msg.proto";
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "veranatest/td/v1/params.proto";
+
+option go_package = "veranatest/x/td/types";
+
+message DustAmount {
+  string dust = 1[
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.moretags) = "yaml:\"dust\"",
+    (gogoproto.nullable) = false
+  ];
+}

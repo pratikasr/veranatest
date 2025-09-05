@@ -17,4 +17,7 @@ const (
 )
 
 // ParamsKey is the prefix to retrieve all Params
-var ParamsKey = collections.NewPrefix("p_td")
+var (
+	ParamsKey     = collections.NewPrefix("p_td")
+	DustAmountKey = collections.NewPrefix(1)
+)

@@ -21,6 +21,7 @@ type Keeper struct {
 
 	Schema     collections.Schema
 	Params     collections.Item[types.Params]
+	DustAmount collections.Item[types.DustAmount]
 	bankKeeper types.BankKeeper
 }
 
@@ -46,6 +47,7 @@ func NewKeeper(
 
 		Params:     collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
 		bankKeeper: bankKeeper,
+		DustAmount: collections.NewItem(sb, types.DustAmountKey, "dust_amount", codec.CollValue[types.DustAmount](cdc)),
 	}
 
 	schema, err := sb.Build()
