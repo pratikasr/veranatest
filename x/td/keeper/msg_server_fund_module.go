@@ -17,15 +17,18 @@ func (k msgServer) FundModule(ctx context.Context, msg *types.MsgFundModule) (*t
 	}
 	senderAcc, _ := sdk.AccAddressFromBech32(msg.Creator)
 
-	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAcc, types.ModuleName, sdk.NewCoins(sdk.NewCoin("uvna", sdkmath.NewInt(msg.Amount))))
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, senderAcc, msg.Module, sdk.NewCoins(sdk.NewCoin("uvna", sdkmath.NewInt(msg.Amount))))
 	if err != nil {
 		return nil, err
 	}
-	params, _ := k.Params.Get(ctx)
-	params.TrustDepositValue = params.TrustDepositValue + uint64(msg.Amount)
-	err = k.Params.Set(ctx, params)
-	if err != nil {
-		return nil, err
+	if msg.Module == types.ModuleName {
+
+		params, _ := k.Params.Get(ctx)
+		params.TrustDepositValue = params.TrustDepositValue + uint64(msg.Amount)
+		err = k.Params.Set(ctx, params)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return &types.MsgFundModuleResponse{}, nil
