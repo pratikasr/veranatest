@@ -22,7 +22,7 @@ func (k msgServer) FundModule(ctx context.Context, msg *types.MsgFundModule) (*t
 		return nil, err
 	}
 	params, _ := k.Params.Get(ctx)
-	params.TrustDepositShareValue = params.TrustDepositShareValue + uint64(msg.Amount)
+	params.TrustDepositValue = params.TrustDepositValue + uint64(msg.Amount)
 	err = k.Params.Set(ctx, params)
 	if err != nil {
 		return nil, err

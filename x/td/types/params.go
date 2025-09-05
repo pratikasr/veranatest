@@ -1,16 +1,24 @@
 package types
 
-const DefaultTrustDepositShareValue uint64 = 1
+import "cosmossdk.io/math"
+
 const DefaultTrustDepositValue uint64 = 0
 
+const (
+	DefaultTrustDepositShareValue = "1.0"
+	DefaultTrustDepositYieldRate  = "0.15"
+)
+
 // NewParams creates a new Params instance.
-func NewParams(trustDepositShareValue uint64, trust_deposit_value uint64) Params {
-	return Params{TrustDepositShareValue: trustDepositShareValue, TrustDepositValue: trust_deposit_value}
+func NewParams(trustDepositShareValue math.LegacyDec, trust_deposit_value uint64, trust_deposit_yield_rate math.LegacyDec) Params {
+	return Params{TrustDepositShareValue: trustDepositShareValue, TrustDepositValue: trust_deposit_value, TrustDepositYieldRate: trust_deposit_yield_rate}
 }
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
-	return NewParams(DefaultTrustDepositShareValue, DefaultTrustDepositValue)
+	TrustDepositShareValue, _ := math.LegacyNewDecFromStr(DefaultTrustDepositShareValue)
+	TrustDepositYieldRate, _ := math.LegacyNewDecFromStr(DefaultTrustDepositYieldRate)
+	return NewParams(TrustDepositShareValue, DefaultTrustDepositValue, TrustDepositYieldRate)
 }
 
 // Validate validates the set of params.
@@ -21,14 +29,21 @@ func (p Params) Validate() error {
 	if err := validateTrustDepositValue(p.TrustDepositValue); err != nil {
 		return err
 	}
+	if err := validateTrustDepositYieldRate(p.TrustDepositYieldRate); err != nil {
+		return err
+	}
 
 	return nil
 }
-func validateTrustDepositShareValue(v uint64) error {
+func validateTrustDepositShareValue(v math.LegacyDec) error {
 
 	return nil
 }
 func validateTrustDepositValue(v uint64) error {
+
+	return nil
+}
+func validateTrustDepositYieldRate(v math.LegacyDec) error {
 
 	return nil
 }
