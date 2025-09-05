@@ -3,8 +3,8 @@
   {
    "@type": "/cosmos.protocolpool.v1.MsgCreateContinuousFund",
    "authority": "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
-   "recipient": "cosmos1xr7fuv6kcgfzw9mct8lj3v2y2fkehjheqqpza6",
-   "percentage": "0.500000000000000000",
+   "recipient": "cosmos1jjfey42zhnwrpv8pmpxgp2jwukcy3emfsewffz",
+   "percentage": "0.005000000000000000",
    "expiry": null
   }
  ],
