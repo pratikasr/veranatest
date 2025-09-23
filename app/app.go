@@ -48,6 +48,7 @@ import (
 
 	"veranatest/docs"
 	tdmodulekeeper "veranatest/x/td/keeper"
+	validatorregistrymodulekeeper "veranatest/x/validatorregistry/keeper"
 )
 
 const (
@@ -100,7 +101,8 @@ type App struct {
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 
-	TdKeeper tdmodulekeeper.Keeper
+	TdKeeper                tdmodulekeeper.Keeper
+	ValidatorregistryKeeper validatorregistrymodulekeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// simulation manager
@@ -182,6 +184,7 @@ func New(
 		&app.ParamsKeeper,
 		&app.ProtocolPoolKeeper,
 		&app.TdKeeper,
+		&app.ValidatorregistryKeeper,
 	); err != nil {
 		panic(err)
 	}

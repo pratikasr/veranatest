@@ -4,6 +4,8 @@ import (
 	"time"
 	_ "veranatest/x/td/module"
 	tdmoduletypes "veranatest/x/td/types"
+	_ "veranatest/x/validatorregistry/module"
+	validatorregistrymoduletypes "veranatest/x/validatorregistry/types"
 
 	runtimev1alpha1 "cosmossdk.io/api/cosmos/app/runtime/v1alpha1"
 	appv1alpha1 "cosmossdk.io/api/cosmos/app/v1alpha1"
@@ -135,6 +137,7 @@ var (
 						ibcexported.ModuleName,
 						// chain modules
 						tdmoduletypes.ModuleName,
+						validatorregistrymoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/beginBlockers
 					},
 					EndBlockers: []string{
@@ -145,6 +148,7 @@ var (
 						protocolpooltypes.ModuleName, // ADD THIS
 						// chain modules
 						tdmoduletypes.ModuleName,
+						validatorregistrymoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/endBlockers
 					},
 					// The following is mostly only needed when ModuleName != StoreKey name.
@@ -183,6 +187,7 @@ var (
 						icatypes.ModuleName,
 						// chain modules
 						tdmoduletypes.ModuleName,
+						validatorregistrymoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 					ExportGenesis: []string{
@@ -314,6 +319,10 @@ var (
 			{
 				Name:   tdmoduletypes.ModuleName,
 				Config: appconfig.WrapAny(&tdmoduletypes.Module{}),
+			},
+			{
+				Name:   validatorregistrymoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&validatorregistrymoduletypes.Module{}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

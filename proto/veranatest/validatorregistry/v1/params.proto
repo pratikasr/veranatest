@@ -1,0 +1,13 @@
+syntax = "proto3";
+package veranatest.validatorregistry.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "veranatest/x/validatorregistry/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (amino.name) = "veranatest/x/validatorregistry/Params";
+  option (gogoproto.equal) = true;
+}

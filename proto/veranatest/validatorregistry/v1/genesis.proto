@@ -1,0 +1,17 @@
+syntax = "proto3";
+package veranatest.validatorregistry.v1;
+
+import "amino/amino.proto";
+import "gogoproto/gogo.proto";
+import "veranatest/validatorregistry/v1/params.proto";
+
+option go_package = "veranatest/x/validatorregistry/types";
+
+// GenesisState defines the validatorregistry module's genesis state.
+message GenesisState {
+  // params defines all the parameters of the module.
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (amino.dont_omitempty) = true
+  ];
+}

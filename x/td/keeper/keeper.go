@@ -2,9 +2,10 @@ package keeper
 
 import (
 	"context"
-	"cosmossdk.io/math"
 	"errors"
 	"fmt"
+
+	"cosmossdk.io/math"
 
 	"cosmossdk.io/collections"
 	"cosmossdk.io/core/address"
