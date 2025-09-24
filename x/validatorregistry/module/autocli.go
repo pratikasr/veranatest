@@ -17,6 +17,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Use:       "params",
 					Short:     "Shows the parameters of the module",
 				},
+				{
+					RpcMethod: "ListValidator",
+					Use:       "list-validator",
+					Short:     "List all validator",
+				},
+				{
+					RpcMethod:      "GetValidator",
+					Use:            "get-validator [id]",
+					Short:          "Gets a validator",
+					Alias:          []string{"show-validator"},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}},
+				},
 				// this line is used by ignite scaffolding # autocli/query
 			},
 		},

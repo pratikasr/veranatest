@@ -1,0 +1,14 @@
+syntax = "proto3";
+package veranatest.validatorregistry.v1;
+
+option go_package = "veranatest/x/validatorregistry/types";
+
+// Validator defines the Validator message.
+message Validator {
+  string index = 1;
+  string member_id = 2;
+  string operator_address = 3;
+  string consensus_pubkey = 4;
+  string status = 5;
+  uint64 term_end = 6;
+}

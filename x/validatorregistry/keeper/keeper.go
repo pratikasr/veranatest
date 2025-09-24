@@ -19,8 +19,9 @@ type Keeper struct {
 	// Typically, this should be the x/gov module account.
 	authority []byte
 
-	Schema collections.Schema
-	Params collections.Item[types.Params]
+	Schema    collections.Schema
+	Params    collections.Item[types.Params]
+	Validator collections.Map[string, types.Validator]
 }
 
 func NewKeeper(
@@ -42,8 +43,8 @@ func NewKeeper(
 		addressCodec: addressCodec,
 		authority:    authority,
 
-		Params: collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
-	}
+		Params:    collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
+		Validator: collections.NewMap(sb, types.ValidatorKey, "validator", collections.StringKey, codec.CollValue[types.Validator](cdc))}
 
 	schema, err := sb.Build()
 	if err != nil {

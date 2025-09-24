@@ -21,8 +21,21 @@ func TestGenesisState_Validate(t *testing.T) {
 		},
 		{
 			desc:     "valid genesis state",
-			genState: &types.GenesisState{},
+			genState: &types.GenesisState{ValidatorMap: []types.Validator{{Index: "0"}, {Index: "1"}}},
 			valid:    true,
+		}, {
+			desc: "duplicated validator",
+			genState: &types.GenesisState{
+				ValidatorMap: []types.Validator{
+					{
+						Index: "0",
+					},
+					{
+						Index: "0",
+					},
+				},
+			},
+			valid: false,
 		},
 	}
 	for _, tc := range tests {

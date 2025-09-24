@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package veranatest.validatorregistry.v1;
 
 import "amino/amino.proto";
@@ -6,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "veranatest/validatorregistry/v1/params.proto";
+import "veranatest/validatorregistry/v1/validator.proto";
 
 option go_package = "veranatest/x/validatorregistry/types";
 
@@ -14,6 +16,16 @@ service Query {
   // Parameters queries the parameters of the module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/veranatest/validatorregistry/v1/params";
+  }
+
+  // ListValidator Queries a list of Validator items.
+  rpc GetValidator(QueryGetValidatorRequest) returns (QueryGetValidatorResponse) {
+    option (google.api.http).get = "/veranatest/validatorregistry/v1/validator/{index}";
+  }
+
+  // ListValidator defines the ListValidator RPC.
+  rpc ListValidator(QueryAllValidatorRequest) returns (QueryAllValidatorResponse) {
+    option (google.api.http).get = "/veranatest/validatorregistry/v1/validator";
   }
 }
 
@@ -27,4 +39,25 @@ message QueryParamsResponse {
     (gogoproto.nullable) = false,
     (amino.dont_omitempty) = true
   ];
+}
+
+// QueryGetValidatorRequest defines the QueryGetValidatorRequest message.
+message QueryGetValidatorRequest {
+  string index = 1;
+}
+
+// QueryGetValidatorResponse defines the QueryGetValidatorResponse message.
+message QueryGetValidatorResponse {
+  Validator validator = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryAllValidatorRequest defines the QueryAllValidatorRequest message.
+message QueryAllValidatorRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryAllValidatorResponse defines the QueryAllValidatorResponse message.
+message QueryAllValidatorResponse {
+  repeated Validator validator = 1 [(gogoproto.nullable) = false];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
