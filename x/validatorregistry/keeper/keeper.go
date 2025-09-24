@@ -6,8 +6,8 @@ import (
 	"cosmossdk.io/collections"
 	"cosmossdk.io/core/address"
 	corestore "cosmossdk.io/core/store"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
-
 	"veranatest/x/validatorregistry/types"
 )
 
@@ -15,6 +15,7 @@ type Keeper struct {
 	storeService corestore.KVStoreService
 	cdc          codec.Codec
 	addressCodec address.Codec
+	logger       log.Logger
 	// Address capable of executing a MsgUpdateParams message.
 	// Typically, this should be the x/gov module account.
 	authority []byte
@@ -29,6 +30,7 @@ func NewKeeper(
 	cdc codec.Codec,
 	addressCodec address.Codec,
 	authority []byte,
+	logger log.Logger,
 
 ) Keeper {
 	if _, err := addressCodec.BytesToString(authority); err != nil {
@@ -42,9 +44,9 @@ func NewKeeper(
 		cdc:          cdc,
 		addressCodec: addressCodec,
 		authority:    authority,
-
-		Params:    collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
-		Validator: collections.NewMap(sb, types.ValidatorKey, "validator", collections.StringKey, codec.CollValue[types.Validator](cdc))}
+		logger:       logger,
+		Params:       collections.NewItem(sb, types.ParamsKey, "params", codec.CollValue[types.Params](cdc)),
+		Validator:    collections.NewMap(sb, types.ValidatorKey, "validator", collections.StringKey, codec.CollValue[types.Validator](cdc))}
 
 	schema, err := sb.Build()
 	if err != nil {
@@ -58,4 +60,8 @@ func NewKeeper(
 // GetAuthority returns the module's authority.
 func (k Keeper) GetAuthority() []byte {
 	return k.authority
+}
+
+func (k Keeper) Logger() log.Logger {
+	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }

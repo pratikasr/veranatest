@@ -40,6 +40,12 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					RpcMethod: "UpdateParams",
 					Skip:      true, // skipped because authority gated
 				},
+				{
+					RpcMethod:      "OnboardValidator",
+					Use:            "onboard-validator [member-id] [node-pubkey] [endpoints] [term-end]",
+					Short:          "Send a onboard-validator tx",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "member_id"}, {ProtoField: "node_pubkey"}, {ProtoField: "endpoints"}, {ProtoField: "term_end"}},
+				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},
 		},

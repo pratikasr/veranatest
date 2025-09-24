@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package veranatest.validatorregistry.v1;
 
 import "amino/amino.proto";
@@ -16,6 +17,9 @@ service Msg {
   // UpdateParams defines a (governance) operation for updating the module
   // parameters. The authority defaults to the x/gov module account.
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+
+  // OnboardValidator defines the OnboardValidator RPC.
+  rpc OnboardValidator(MsgOnboardValidator) returns (MsgOnboardValidatorResponse);
 }
 
 // MsgUpdateParams is the Msg/UpdateParams request type.
@@ -27,7 +31,7 @@ message MsgUpdateParams {
   string authority = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
 
   // params defines the module parameters to update.
-  //
+
   // NOTE: All parameters must be supplied.
   Params params = 2 [
     (gogoproto.nullable) = false,
@@ -38,3 +42,16 @@ message MsgUpdateParams {
 // MsgUpdateParamsResponse defines the response structure for executing a
 // MsgUpdateParams message.
 message MsgUpdateParamsResponse {}
+
+// MsgOnboardValidator defines the MsgOnboardValidator message.
+message MsgOnboardValidator {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string member_id = 2;
+  string node_pubkey = 3;
+  string endpoints = 4;
+  uint64 term_end = 5;
+}
+
+// MsgOnboardValidatorResponse defines the MsgOnboardValidatorResponse message.
+message MsgOnboardValidatorResponse {}

@@ -216,6 +216,7 @@ var (
 						icatypes.ModuleName,
 						// chain modules
 						tdmoduletypes.ModuleName,
+						validatorregistrymoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 				}),

@@ -6,9 +6,9 @@ import (
 	"cosmossdk.io/core/store"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/depinject/appconfig"
+	"cosmossdk.io/log"
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-
 	"veranatest/x/validatorregistry/keeper"
 	"veranatest/x/validatorregistry/types"
 )
@@ -32,9 +32,9 @@ type ModuleInputs struct {
 	StoreService store.KVStoreService
 	Cdc          codec.Codec
 	AddressCodec address.Codec
-
-	AuthKeeper types.AuthKeeper
-	BankKeeper types.BankKeeper
+	Logger       log.Logger
+	AuthKeeper   types.AuthKeeper
+	BankKeeper   types.BankKeeper
 }
 
 type ModuleOutputs struct {
@@ -55,6 +55,7 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Cdc,
 		in.AddressCodec,
 		authority,
+		in.Logger,
 	)
 	m := NewAppModule(in.Cdc, k, in.AuthKeeper, in.BankKeeper)
 
