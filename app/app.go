@@ -1,16 +1,16 @@
 package app
 
 import (
-	"io"
-
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	circuitkeeper "cosmossdk.io/x/circuit/keeper"
+	_ "cosmossdk.io/x/feegrant/keeper"
+	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-
+	"fmt"
 	abci "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -25,6 +25,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -45,7 +46,8 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
-
+	"io"
+	appante "veranatest/ante"
 	"veranatest/docs"
 	tdmodulekeeper "veranatest/x/td/keeper"
 	validatorregistrymodulekeeper "veranatest/x/validatorregistry/keeper"
@@ -100,6 +102,7 @@ type App struct {
 	ICAControllerKeeper icacontrollerkeeper.Keeper
 	ICAHostKeeper       icahostkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
+	FeegrantKeeper      feegrantkeeper.Keeper
 
 	TdKeeper                tdmodulekeeper.Keeper
 	ValidatorregistryKeeper validatorregistrymodulekeeper.Keeper
@@ -195,6 +198,19 @@ func New(
 
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
+
+	anteHandler, err := appante.NewAnteHandler(
+		app.AuthKeeper,
+		app.BankKeeper,
+		app.txConfig.SignModeHandler(),
+		ante.DefaultSigVerificationGasConsumer,
+	)
+	if err != nil {
+		fmt.Printf("ERROR: Failed to create ante handler: %v", err)
+		panic(err)
+	}
+
+	app.SetAnteHandler(anteHandler)
 
 	// register legacy modules
 	if err := app.registerIBCModules(appOpts); err != nil {

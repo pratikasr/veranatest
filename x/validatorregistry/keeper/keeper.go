@@ -1,12 +1,11 @@
 package keeper
 
 import (
-	"fmt"
-
 	"cosmossdk.io/collections"
 	"cosmossdk.io/core/address"
 	corestore "cosmossdk.io/core/store"
 	"cosmossdk.io/log"
+	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"veranatest/x/validatorregistry/types"
 )
