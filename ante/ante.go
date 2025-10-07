@@ -6,18 +6,22 @@ import (
 
 	txsigning "cosmossdk.io/x/tx/signing"
 
+	validatorregistrykeeper "veranatest/x/validatorregistry/keeper"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
-// NewAnteHandler returns an AnteHandler with debugging
+// NewAnteHandler returns an AnteHandler that includes validator whitelist checking
+// It follows the standard Cosmos SDK pattern of injecting module keepers as dependencies
 func NewAnteHandler(
 	accountKeeper authkeeper.AccountKeeper,
 	bankKeeper bankkeeper.Keeper,
 	signModeHandler *txsigning.HandlerMap,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
+	validatorRegistryKeeper validatorregistrykeeper.Keeper,
 ) (sdk.AnteHandler, error) {
 
 	if bankKeeper == nil {
@@ -27,19 +31,19 @@ func NewAnteHandler(
 		return nil, fmt.Errorf("sign mode handler is required")
 	}
 
-	// Start with just basic decorators
+	// Chain decorators in order
 	anteDecorators := []sdk.AnteDecorator{
 		ante.NewSetUpContextDecorator(),
 		ante.NewValidateBasicDecorator(),
 
-		// ADD OUR CUSTOM VALIDATOR WHITELIST DECORATOR HERE
-		NewValidatorWhitelistDecorator(),
+		// Validator whitelist check - uses validatorregistry keeper to check KV store
+		NewValidatorWhitelistDecorator(validatorRegistryKeeper),
 
-		// Try with minimal decorators first
+		// Standard Cosmos SDK decorators
 		ante.NewDeductFeeDecorator(accountKeeper, bankKeeper, nil, nil),
 		ante.NewIncrementSequenceDecorator(accountKeeper),
 	}
 
-	log.Printf("DEBUG: Successfully created ante decorators")
+	log.Printf("DEBUG: Successfully created ante decorators with validator whitelist")
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
 }

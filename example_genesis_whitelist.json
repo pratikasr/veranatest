@@ -1,0 +1,40 @@
+{
+  "comment": "Example genesis configuration for validator whitelist",
+  "instructions": "Add this to your genesis.json under app_state.validatorregistry.validator_map",
+  "validator_map": [
+    {
+      "index": "validator1",
+      "member_id": "member001",
+      "operator_address": "cosmosvaloper16mzeyu9l6kua2cdg9x0jk5g6e7h0kk8q0qpggj",
+      "consensus_pubkey": "",
+      "status": "active",
+      "term_end": 0
+    },
+    {
+      "index": "validator2",
+      "member_id": "member002",
+      "operator_address": "cosmosvaloper1...",
+      "consensus_pubkey": "",
+      "status": "active",
+      "term_end": 0
+    },
+    {
+      "index": "validator3",
+      "member_id": "member003",
+      "operator_address": "cosmosvaloper1...",
+      "consensus_pubkey": "",
+      "status": "active",
+      "term_end": 0
+    }
+  ],
+  "notes": [
+    "To get validator operator address: veranatestd keys show <key-name> --bech32=val --keyring-backend test -a",
+    "index: Unique identifier for the validator",
+    "member_id: Organization member ID",
+    "operator_address: Validator operator address (cosmosvaloper...)",
+    "consensus_pubkey: Optional, can be empty string",
+    "status: 'active' or 'inactive'",
+    "term_end: Unix timestamp for expiration, 0 for no expiration"
+  ]
+}
+

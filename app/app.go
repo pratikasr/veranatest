@@ -1,6 +1,13 @@
 package app
 
 import (
+	"fmt"
+	"io"
+	appante "veranatest/ante"
+	"veranatest/docs"
+	tdmodulekeeper "veranatest/x/td/keeper"
+	validatorregistrymodulekeeper "veranatest/x/validatorregistry/keeper"
+
 	clienthelpers "cosmossdk.io/client/v2/helpers"
 	"cosmossdk.io/core/appmodule"
 	"cosmossdk.io/depinject"
@@ -10,7 +17,6 @@ import (
 	_ "cosmossdk.io/x/feegrant/keeper"
 	feegrantkeeper "cosmossdk.io/x/feegrant/keeper"
 	upgradekeeper "cosmossdk.io/x/upgrade/keeper"
-	"fmt"
 	abci "github.com/cometbft/cometbft/abci/types"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -46,11 +52,6 @@ import (
 	icahostkeeper "github.com/cosmos/ibc-go/v10/modules/apps/27-interchain-accounts/host/keeper"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v10/modules/apps/transfer/keeper"
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
-	"io"
-	appante "veranatest/ante"
-	"veranatest/docs"
-	tdmodulekeeper "veranatest/x/td/keeper"
-	validatorregistrymodulekeeper "veranatest/x/validatorregistry/keeper"
 )
 
 const (
@@ -199,11 +200,14 @@ func New(
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
+	// Create ante handler with validator whitelist check
+	// Pass validatorregistry keeper to enable KV store access for whitelist checking
 	anteHandler, err := appante.NewAnteHandler(
 		app.AuthKeeper,
 		app.BankKeeper,
 		app.txConfig.SignModeHandler(),
 		ante.DefaultSigVerificationGasConsumer,
+		app.ValidatorregistryKeeper,
 	)
 	if err != nil {
 		fmt.Printf("ERROR: Failed to create ante handler: %v", err)

@@ -1,13 +1,16 @@
 package keeper
 
 import (
+	"context"
+
+	"fmt"
+	"veranatest/x/validatorregistry/types"
+
 	"cosmossdk.io/collections"
 	"cosmossdk.io/core/address"
 	corestore "cosmossdk.io/core/store"
 	"cosmossdk.io/log"
-	"fmt"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"veranatest/x/validatorregistry/types"
 )
 
 type Keeper struct {
@@ -63,4 +66,19 @@ func (k Keeper) GetAuthority() []byte {
 
 func (k Keeper) Logger() log.Logger {
 	return k.logger.With("module", fmt.Sprintf("x/%s", types.ModuleName))
+}
+
+// IsValidatorWhitelisted checks if a validator operator address is whitelisted
+// This method is used by the ante handler to verify if a validator can create a validator
+func (k Keeper) IsValidatorWhitelisted(ctx context.Context, operatorAddress string) bool {
+	// Walk through all validators in the store and check if the operator address matches
+	var found bool
+	_ = k.Validator.Walk(ctx, nil, func(key string, val types.Validator) (stop bool, err error) {
+		if val.OperatorAddress == operatorAddress {
+			found = true
+			return true, nil // stop iteration when found
+		}
+		return false, nil // continue iteration
+	})
+	return found
 }

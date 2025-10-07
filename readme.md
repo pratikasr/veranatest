@@ -1,7 +1,21 @@
 # veranatest
 **veranatest** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
 
+## Features
+
+- **Validator Whitelist**: Only whitelisted validators (stored in KV store) can create validators
+- **Validator Registry Module**: Manages authorized validators via genesis or transactions
+- **Standard Cosmos SDK Pattern**: Ante handler accesses module keeper for whitelist checks
+
 ## Get started
+
+### Quick Start with Validator Whitelist
+
+See [README_WHITELIST.md](./README_WHITELIST.md) for complete setup instructions.
+
+**TL;DR**: Add validators to genesis file → Start chain → Whitelisted validators can create validators
+
+### Development Mode
 
 ```
 ignite chain serve

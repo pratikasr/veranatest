@@ -161,6 +161,7 @@ var (
 					// NOTE: The genutils module must occur after staking so that pools are
 					// properly initialized with tokens from genesis accounts.
 					// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
+					// NOTE: validatorregistry must occur BEFORE genutil so whitelist is loaded before gentxs are processed
 					InitGenesis: []string{
 						consensustypes.ModuleName,
 						authtypes.ModuleName,
@@ -170,6 +171,8 @@ var (
 						slashingtypes.ModuleName,
 						govtypes.ModuleName,
 						minttypes.ModuleName,
+						// Load validatorregistry BEFORE genutil so whitelist is available
+						validatorregistrymoduletypes.ModuleName,
 						genutiltypes.ModuleName,
 						evidencetypes.ModuleName,
 						authz.ModuleName,
@@ -187,7 +190,6 @@ var (
 						icatypes.ModuleName,
 						// chain modules
 						tdmoduletypes.ModuleName,
-						validatorregistrymoduletypes.ModuleName,
 						// this line is used by starport scaffolding # stargate/app/initGenesis
 					},
 					ExportGenesis: []string{
