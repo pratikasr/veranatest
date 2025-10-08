@@ -107,6 +107,45 @@ $SED_CMD 's/swagger = false/swagger = true/' "$APP_TOML_PATH"
 $SED_CMD 's/enabled-unsafe-cors = false/enabled-unsafe-cors = true/' "$APP_TOML_PATH"
 $SED_CMD 's/cors_allowed_origins = \[\]/cors_allowed_origins = \["*"\]/' "$CONFIG_TOML_PATH"
 
+# ============================================================================
+# CRITICAL: Add validator to whitelist BEFORE collecting gentxs
+# ============================================================================
+log "Adding validator to whitelist..."
+
+# Get the validator operator address
+VALIDATOR_OPERATOR_ADDRESS=$($BINARY keys show $VALIDATOR_NAME --keyring-backend test --bech val -a)
+if [ $? -ne 0 ]; then
+    log "Error: Failed to get validator operator address."
+    exit 1
+fi
+log "Validator operator address: $VALIDATOR_OPERATOR_ADDRESS"
+
+# Add validator to the whitelist in genesis.json
+log "Updating genesis.json with validator whitelist entry..."
+TMP_GENESIS=$(mktemp)
+jq --arg operator_addr "$VALIDATOR_OPERATOR_ADDRESS" \
+   '.app_state.validatorregistry.validator_map += [{
+      "index": "validator1",
+      "member_id": "member001",
+      "operator_address": $operator_addr,
+      "consensus_pubkey": "",
+      "status": "active",
+      "term_end": 0
+   }]' "$GENESIS_JSON_PATH" > "$TMP_GENESIS"
+
+if [ $? -ne 0 ]; then
+    log "Error: Failed to update validator whitelist in genesis.json"
+    rm -f "$TMP_GENESIS"
+    exit 1
+fi
+
+mv "$TMP_GENESIS" "$GENESIS_JSON_PATH"
+log "✓ Validator added to whitelist successfully"
+
+# Verify the whitelist was added
+WHITELIST_COUNT=$(jq '.app_state.validatorregistry.validator_map | length' "$GENESIS_JSON_PATH")
+log "Validators in whitelist: $WHITELIST_COUNT"
+
 # Collect genesis transactions
 log "Collecting genesis transactions..."
 $BINARY genesis collect-gentxs
