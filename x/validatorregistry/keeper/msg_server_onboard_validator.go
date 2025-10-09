@@ -15,46 +15,47 @@ func (k msgServer) OnboardValidator(ctx context.Context, msg *types.MsgOnboardVa
 		return nil, errorsmod.Wrap(err, "invalid authority address")
 	}
 
-	// Generate index from member_id (use member_id as unique identifier)
-	index := msg.MemberId
+	// Validate required fields
+	if msg.Index == "" {
+		return nil, errorsmod.Wrap(types.ErrInvalidValidator, "index cannot be empty")
+	}
+	if msg.MemberId == "" {
+		return nil, errorsmod.Wrap(types.ErrInvalidValidator, "member_id cannot be empty")
+	}
+	if msg.OperatorAddress == "" {
+		return nil, errorsmod.Wrap(types.ErrInvalidValidator, "operator_address cannot be empty")
+	}
+	if msg.Status == "" {
+		return nil, errorsmod.Wrap(types.ErrInvalidValidator, "status cannot be empty")
+	}
 
 	// Check if validator with this index already exists
-	exists, err := k.Validator.Has(ctx, index)
+	exists, err := k.Validator.Has(ctx, msg.Index)
 	if err != nil {
 		return nil, errorsmod.Wrap(err, "failed to check validator existence")
 	}
 	if exists {
-		return nil, errorsmod.Wrapf(types.ErrInvalidValidator, "validator with index %s already exists", index)
+		return nil, errorsmod.Wrapf(types.ErrInvalidValidator, "validator with index %s already exists", msg.Index)
 	}
-
-	// WORKAROUND: Since operator_address field is missing from proto,
-	// we're temporarily using the 'endpoints' field to pass the operator address.
-	// In the future, update the proto to add operator_address as a proper field.
-	operatorAddress := msg.Endpoints
 
 	// Validate operator address format (should be cosmosvaloper...)
-	if operatorAddress == "" {
-		return nil, errorsmod.Wrap(types.ErrInvalidValidator, "operator address (passed via endpoints) cannot be empty")
-	}
-
-	// Optionally validate it's a valid bech32 address with valoper prefix
-	_, err = sdk.ValAddressFromBech32(operatorAddress)
+	_, err = sdk.ValAddressFromBech32(msg.OperatorAddress)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.ErrInvalidValidator, "invalid operator address format: %v", err)
 	}
 
 	// Create the Validator object
 	validator := types.Validator{
-		Index:           index,
+		Index:           msg.Index,
 		MemberId:        msg.MemberId,
-		OperatorAddress: operatorAddress,
-		ConsensusPubkey: msg.NodePubkey,
-		Status:          "active", // Hardcoded for now, should be added to proto
+		OperatorAddress: msg.OperatorAddress,
+		ConsensusPubkey: msg.ConsensusPubkey,
+		Status:          msg.Status,
 		TermEnd:         msg.TermEnd,
 	}
 
 	// Store the validator in the KV store
-	if err := k.Validator.Set(ctx, index, validator); err != nil {
+	if err := k.Validator.Set(ctx, msg.Index, validator); err != nil {
 		return nil, errorsmod.Wrap(err, "failed to store validator")
 	}
 
@@ -63,9 +64,10 @@ func (k msgServer) OnboardValidator(ctx context.Context, msg *types.MsgOnboardVa
 	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			"validator_onboarded",
-			sdk.NewAttribute("index", index),
+			sdk.NewAttribute("index", msg.Index),
 			sdk.NewAttribute("member_id", msg.MemberId),
-			sdk.NewAttribute("operator_address", operatorAddress),
+			sdk.NewAttribute("operator_address", msg.OperatorAddress),
+			sdk.NewAttribute("status", msg.Status),
 		),
 	)
 

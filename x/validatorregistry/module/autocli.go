@@ -42,9 +42,9 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 				},
 				{
 					RpcMethod:      "OnboardValidator",
-					Use:            "onboard-validator [member-id] [node-pubkey] [endpoints] [term-end]",
+					Use:            "onboard-validator [index] [member-id] [operator-address] [consensus-pubkey] [status] [term-end]",
 					Short:          "Send a onboard-validator tx",
-					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "member_id"}, {ProtoField: "node_pubkey"}, {ProtoField: "endpoints"}, {ProtoField: "term_end"}},
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "index"}, {ProtoField: "member_id"}, {ProtoField: "operator_address"}, {ProtoField: "consensus_pubkey"}, {ProtoField: "status"}, {ProtoField: "term_end"}},
 				},
 				// this line is used by ignite scaffolding # autocli/tx
 			},

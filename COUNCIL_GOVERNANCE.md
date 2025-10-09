@@ -349,10 +349,13 @@ This method uses the council to vote on adding new validators.
 **Step 1: Get the validator operator address**
 
 ```bash
-# Get the operator address for the validator you want to add
-# This should be the cosmosvaloper address
-VALIDATOR_OPERATOR_ADDR=$(veranatestd keys show <validator-key-name> --bech val --keyring-backend test -a)
+# Example: Promote council-member-2 to become a validator
+# Get the operator address (cosmosvaloper...) for the member
+VALIDATOR_OPERATOR_ADDR=$(veranatestd keys show council-member-2 --bech val --keyring-backend test -a)
 echo "Validator operator address: $VALIDATOR_OPERATOR_ADDR"
+
+# For other members, replace council-member-2 with the key name
+# VALIDATOR_OPERATOR_ADDR=$(veranatestd keys show <your-key-name> --bech val --keyring-backend test -a)
 ```
 
 **Step 2: Create proposal JSON file**
@@ -368,9 +371,11 @@ cat > add_validator_proposal.json <<EOF
     {
       "@type": "/veranatest.validatorregistry.v1.MsgOnboardValidator",
       "creator": "$GROUP_POLICY_ADDRESS",
+      "index": "validator2",
       "member_id": "member002",
-      "node_pubkey": "",
-      "endpoints": "$VALIDATOR_OPERATOR_ADDR",
+      "operator_address": "$VALIDATOR_OPERATOR_ADDR",
+      "consensus_pubkey": "",
+      "status": "active",
       "term_end": 0
     }
   ],
@@ -382,7 +387,14 @@ cat > add_validator_proposal.json <<EOF
 EOF
 ```
 
-> **⚠️ Important Note:** Due to proto limitations, we're using the `endpoints` field to pass the validator's **operator address** (cosmosvaloper...). This is a temporary workaround until the proto is updated to include a proper `operator_address` field.
+**Field Descriptions:**
+- `creator`: Group policy address (authority)
+- `index`: Unique identifier for the validator (e.g., "validator2")
+- `member_id`: Council member ID
+- `operator_address`: The validator's operator address (cosmosvaloper...)
+- `consensus_pubkey`: Validator's consensus public key (optional, can be empty)
+- `status`: Validator status ("active", "suspended", etc.)
+- `term_end`: Unix timestamp for term expiration (0 for no expiration)
 
 **Step 3: Submit proposal**
 
@@ -459,12 +471,19 @@ veranatestd query validatorregistry list-validator
 
 ✅ **Handler Status:** Implementation complete! The handler now:
 - Validates creator (group policy) address
+- Validates all required fields (index, member_id, operator_address, status)
 - Checks for duplicate validators
 - Stores validator in KV store with all fields
-- Emits `validator_onboarded` event
-- Validates operator address format
+- Emits `validator_onboarded` event with full details
+- Validates operator address format (cosmosvaloper...)
 
-⚠️ **Proto Workaround:** Pass the validator's **operator address** (cosmosvaloper...) in the `endpoints` field until proto is updated with proper `operator_address` field.
+✅ **Proto Status:** All proper fields are now in place:
+- `index` - Unique validator identifier
+- `member_id` - Council member ID
+- `operator_address` - Validator operator address (cosmosvaloper...)
+- `consensus_pubkey` - Validator consensus public key
+- `status` - Validator status (active, suspended, etc.)
+- `term_end` - Term expiration timestamp
 
 ---
 
@@ -549,7 +568,7 @@ veranatestd query group proposals-by-group-policy $GROUP_POLICY_ADDRESS
 - **Execution Result:** PROPOSAL_EXECUTOR_RESULT_SUCCESS
 - **Transaction Hash:** 5100FCFBBAC1FF939212C2744821906EC765EB00C3D63F12552BC999C4D2844D
 
-**Note:** ✅ Handler implementation is now complete! Validators are properly stored in the KV store. Remember to pass the operator address in the `endpoints` field (proto workaround).
+**Note:** ✅ Handler implementation is complete! Validators are properly stored in the KV store with all required fields including proper operator_address.
 
 ---
 
@@ -1034,10 +1053,11 @@ Configure the `validatorregistry` module to accept the group policy address as i
 
 1. **MsgOnboardValidator Handler**
    - Status: ✅ **COMPLETE**
+   - Proto: ✅ Updated with proper fields (index, operator_address, consensus_pubkey, status)
    - Implementation: Stores validator in KV store with all required fields
-   - Validates operator address format and checks for duplicates
-   - Emits validator_onboarded event
-   - Proto Workaround: Uses `endpoints` field for operator_address
+   - Validates all fields including operator address format
+   - Checks for duplicate validators
+   - Emits validator_onboarded event with full details
 
 2. **MsgRenewValidator** 
    - Status: Not yet implemented
@@ -1220,12 +1240,12 @@ The council governance system is **fully functional and production-ready** for:
 The council-based governance system using Cosmos SDK's `x/group` module has been **comprehensively tested and validated**. All 10 tests passed with 100% success rate. The system correctly enforces 2/3 threshold voting, prevents unauthorized execution, and provides a transparent, on-chain governance process.
 
 **Implementation Progress:**
-- ✅ `MsgOnboardValidator` - **COMPLETE** - Fully functional with proto workaround
+- ✅ `MsgOnboardValidator` - **COMPLETE** - Fully functional with proper proto fields
 - ⏳ `MsgRenewValidator` - Not yet implemented
 - ⏳ `MsgOffboardValidator` - Not yet implemented  
 - ⏳ `MsgSuspendValidator` - Not yet implemented
 
-**Next Steps:** Implement the remaining message handlers and update proto definitions to add proper `operator_address` and `status` fields.
+**Next Steps:** Implement the remaining message handlers for validator lifecycle management (renew, offboard, suspend).
 
 **Documentation Status:** ✅ Complete with all test results, transaction hashes, and real-world examples.
 

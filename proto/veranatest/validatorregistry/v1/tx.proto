@@ -47,10 +47,12 @@ message MsgUpdateParamsResponse {}
 message MsgOnboardValidator {
   option (cosmos.msg.v1.signer) = "creator";
   string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
-  string member_id = 2;
-  string node_pubkey = 3;
-  string endpoints = 4;
-  uint64 term_end = 5;
+  string index = 2;
+  string member_id = 3;
+  string operator_address = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  string consensus_pubkey = 5;
+  string status = 6;
+  uint64 term_end = 7;
 }
 
 // MsgOnboardValidatorResponse defines the MsgOnboardValidatorResponse message.
