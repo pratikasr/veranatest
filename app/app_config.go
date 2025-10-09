@@ -324,8 +324,10 @@ var (
 				Config: appconfig.WrapAny(&tdmoduletypes.Module{}),
 			},
 			{
-				Name:   validatorregistrymoduletypes.ModuleName,
-				Config: appconfig.WrapAny(&validatorregistrymoduletypes.Module{}),
+				Name: validatorregistrymoduletypes.ModuleName,
+				Config: appconfig.WrapAny(&validatorregistrymoduletypes.Module{
+					Authority: "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
+				}),
 			},
 			// this line is used by starport scaffolding # stargate/app/moduleConfig
 		},

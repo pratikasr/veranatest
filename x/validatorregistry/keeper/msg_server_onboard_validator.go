@@ -10,9 +10,21 @@ import (
 )
 
 func (k msgServer) OnboardValidator(ctx context.Context, msg *types.MsgOnboardValidator) (*types.MsgOnboardValidatorResponse, error) {
-	// Validate creator address (should be the group policy or authorized address)
-	if _, err := k.addressCodec.StringToBytes(msg.Creator); err != nil {
-		return nil, errorsmod.Wrap(err, "invalid authority address")
+	// Validate creator address format
+	creatorAddr, err := k.addressCodec.StringToBytes(msg.Creator)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "invalid creator address")
+	}
+
+	// IMPORTANT: Check that creator is the module authority (group policy address)
+	// This ensures only authorized entities (like the council via governance proposal) can onboard validators
+	authority := k.GetAuthority()
+	if !sdk.AccAddress(creatorAddr).Equals(sdk.AccAddress(authority)) {
+		return nil, errorsmod.Wrapf(types.ErrInvalidSigner,
+			"expected authority %s, got %s",
+			sdk.AccAddress(authority).String(),
+			msg.Creator,
+		)
 	}
 
 	// Validate required fields

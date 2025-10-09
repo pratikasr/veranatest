@@ -262,23 +262,54 @@ echo "Council Governor Address: $GROUP_POLICY_ADDRESS"
 
 ---
 
-### Step 5: Understanding Validator Addition Flow
+### Step 5: Set Group Policy as Module Authority ⚠️ IMPORTANT
 
-Currently, validators can be added to the whitelist in two ways:
+**Security:** The `validatorregistry` module has an **authority** that controls who can execute `MsgOnboardValidator`. By default, this is the governance module, but for council governance, it should be the **group policy address**.
 
-**Method 1: Via Genesis (Before Chain Start)**
-- Add validators to `validatorregistry.validator_map` in genesis.json
-- Used during initial chain setup
-- See `setup_validator.sh` for example
+**Check Current Authority:**
+```bash
+# The authority is typically the governance module account
+# For council governance, it should be the group policy address
+echo "Group Policy: cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
+```
 
-**Method 2: Via Council Governance (After Chain Start)**
-- Submit `MsgOnboardValidator` proposal through council
-- Council votes (requires 2/3 approval)
-- Execute to add validator to whitelist
-- **Status:** ✅ Proposal system fully tested
-- **Pending:** Handler implementation to actually store validators
+**Option A: Update Authority via Governance Proposal** (Recommended)
 
-**Note:** The `validatorregistry` module doesn't have parameters to query. The module state is in the validator map.
+Submit a governance proposal to update the module authority:
+
+```bash
+# Create proposal to update authority to group policy
+cat > update_authority.json <<EOF
+{
+  "messages": [{
+    "@type": "/veranatest.validatorregistry.v1.MsgUpdateParams",
+    "authority": "<current-gov-authority>",
+    "params": {}
+  }]
+}
+EOF
+
+# Note: This requires updating the proto to include authority in params
+```
+
+**Option B: Set in Module Config** (At Chain Init)
+
+In `app/app_config.go`:
+```go
+{
+    Name: validatorregistrymoduletypes.ModuleName,
+    Config: appconfig.WrapAny(&validatorregistrymoduletypes.Module{
+        Authority: "cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd",
+    }),
+}
+```
+
+**Security Implications:**
+- ✅ **With authority check:** Only the authority (group policy) can onboard validators
+- ❌ **Without authority check:** Anyone could call `OnboardValidator` directly
+- 🔒 **Current status:** Authority check is enforced in the handler
+
+**Note:** Until the authority is set to the group policy address, only the default authority (governance module) can execute validator onboarding.
 
 ---
 
