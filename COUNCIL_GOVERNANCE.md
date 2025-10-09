@@ -197,18 +197,36 @@ export GROUP_ID=1
 Create a group policy account with a **threshold decision policy** requiring 2/3 votes:
 
 ```bash
-# Create group policy with threshold decision
+# First, create the policy JSON file
+cat > policy.json <<'EOF'
+{
+    "@type": "/cosmos.group.v1.ThresholdDecisionPolicy",
+    "threshold": "2",
+    "windows": {
+        "voting_period": "172800s",
+        "min_execution_period": "0s"
+    }
+}
+EOF
+
+# Set variables
+MEMBER_1=$(veranatestd keys show council-member-1 -a --keyring-backend test)
+GROUP_ID=1
+
+# Create group policy using the file
 veranatestd tx group create-group-policy \
   $MEMBER_1 \
   $GROUP_ID \
   "Council Governor - 2/3 threshold for validator decisions" \
-  '{"@type":"/cosmos.group.v1.ThresholdDecisionPolicy","threshold":"2","windows":{"voting_period":"172800s","min_execution_period":"0s"}}' \
+  policy.json \
   --from council-member-1 \
   --chain-id vna-testnet-1 \
   --keyring-backend test \
   --fees 500000uvna \
   -y
 
+# Wait for transaction
+sleep 6
 
 # Query group policies
 veranatestd query group group-policies-by-group $GROUP_ID
@@ -328,7 +346,16 @@ This method uses the council to vote on adding new validators.
 - Council must be set up (Group + Group Policy)
 - Council policy address must be known
 
-**Step 1: Create proposal JSON file**
+**Step 1: Get the validator operator address**
+
+```bash
+# Get the operator address for the validator you want to add
+# This should be the cosmosvaloper address
+VALIDATOR_OPERATOR_ADDR=$(veranatestd keys show <validator-key-name> --bech val --keyring-backend test -a)
+echo "Validator operator address: $VALIDATOR_OPERATOR_ADDR"
+```
+
+**Step 2: Create proposal JSON file**
 
 ```bash
 GROUP_POLICY_ADDRESS="cosmos1afk9zr2hn2jsac63h4hm60vl9z3e5u69gndzf7c99cqge3vzwjzsfwkgpd"
@@ -343,7 +370,7 @@ cat > add_validator_proposal.json <<EOF
       "creator": "$GROUP_POLICY_ADDRESS",
       "member_id": "member002",
       "node_pubkey": "",
-      "endpoints": "",
+      "endpoints": "$VALIDATOR_OPERATOR_ADDR",
       "term_end": 0
     }
   ],
@@ -355,7 +382,9 @@ cat > add_validator_proposal.json <<EOF
 EOF
 ```
 
-**Step 2: Submit proposal**
+> **⚠️ Important Note:** Due to proto limitations, we're using the `endpoints` field to pass the validator's **operator address** (cosmosvaloper...). This is a temporary workaround until the proto is updated to include a proper `operator_address` field.
+
+**Step 3: Submit proposal**
 
 ```bash
 veranatestd tx group submit-proposal add_validator_proposal.json \
@@ -366,7 +395,7 @@ veranatestd tx group submit-proposal add_validator_proposal.json \
   -y
 ```
 
-**Step 3: Get proposal ID and vote**
+**Step 4: Get proposal ID and vote**
 
 ```bash
 # Wait for submission
@@ -401,7 +430,7 @@ veranatestd tx group vote $PROPOSAL_ID \
   -y
 ```
 
-**Step 4: Execute the proposal**
+**Step 5: Execute the proposal**
 
 ```bash
 # Wait for votes to be recorded
@@ -416,7 +445,7 @@ veranatestd tx group exec $PROPOSAL_ID \
   -y
 ```
 
-**Step 5: Verify**
+**Step 6: Verify the validator was added**
 
 ```bash
 # Wait for execution
@@ -428,7 +457,14 @@ veranatestd query validatorregistry list-validator
 
 ✅ **Status:** Proposal submission, voting, and execution fully tested (see Test Results Summary)
 
-⚠️ **Note:** The proposal executes successfully, but the current handler doesn't store the validator yet. Once the handler is implemented, this will fully add validators to the whitelist.
+✅ **Handler Status:** Implementation complete! The handler now:
+- Validates creator (group policy) address
+- Checks for duplicate validators
+- Stores validator in KV store with all fields
+- Emits `validator_onboarded` event
+- Validates operator address format
+
+⚠️ **Proto Workaround:** Pass the validator's **operator address** (cosmosvaloper...) in the `endpoints` field until proto is updated with proper `operator_address` field.
 
 ---
 
@@ -457,12 +493,12 @@ veranatestd query group votes-by-proposal <proposal-id>
 
 Once the council is established and has authority over the validator registry, these proposal types can be used:
 
-### Proposal Type 1: OnboardValidator ✅ TESTED
+### Proposal Type 1: OnboardValidator ✅ TESTED & IMPLEMENTED
 
 Adds a new validator to the whitelist, allowing them to create a validator node.
 
 **Implementation Status:** ✅ Message type exists (proto defined)  
-**Handler Status:** ⚠️ Stub implementation (doesn't store validator yet)  
+**Handler Status:** ✅ **COMPLETE** - Stores validators in KV store  
 **Test Status:** ✅ **FULLY TESTED** - Proposal created, voted, and executed successfully
 
 ```bash
@@ -513,7 +549,7 @@ veranatestd query group proposals-by-group-policy $GROUP_POLICY_ADDRESS
 - **Execution Result:** PROPOSAL_EXECUTOR_RESULT_SUCCESS
 - **Transaction Hash:** 5100FCFBBAC1FF939212C2744821906EC765EB00C3D63F12552BC999C4D2844D
 
-**Note:** ⚠️ The proposal executes successfully, but the handler doesn't actually store the validator in the KV store yet (stub implementation). Once the handler is completed, this will fully onboard validators.
+**Note:** ✅ Handler implementation is now complete! Validators are properly stored in the KV store. Remember to pass the operator address in the `endpoints` field (proto workaround).
 
 ---
 
@@ -997,9 +1033,11 @@ Configure the `validatorregistry` module to accept the group policy address as i
 #### Module Handler Development Needed:
 
 1. **MsgOnboardValidator Handler**
-   - Current: Stub implementation (TODO)
-   - Needed: Store validator in KV store with operator_address, status, etc.
-   - Impact: Proposal executes but doesn't add validator to registry
+   - Status: ✅ **COMPLETE**
+   - Implementation: Stores validator in KV store with all required fields
+   - Validates operator address format and checks for duplicates
+   - Emits validator_onboarded event
+   - Proto Workaround: Uses `endpoints` field for operator_address
 
 2. **MsgRenewValidator** 
    - Status: Not yet implemented
@@ -1171,7 +1209,9 @@ The council governance system is **fully functional and production-ready** for:
 - ✅ Secure execution of accepted proposals
 - ✅ Rejection of insufficient proposals
 
-**Only Pending:** Integration with `validatorregistry` module handlers to actually store/modify validators in the KV store.
+**Implementation Status:** 
+- ✅ `MsgOnboardValidator` - Complete and functional
+- ⏳ `MsgRenewValidator`, `MsgOffboardValidator`, `MsgSuspendValidator` - To be implemented
 
 ---
 
@@ -1179,7 +1219,13 @@ The council governance system is **fully functional and production-ready** for:
 
 The council-based governance system using Cosmos SDK's `x/group` module has been **comprehensively tested and validated**. All 10 tests passed with 100% success rate. The system correctly enforces 2/3 threshold voting, prevents unauthorized execution, and provides a transparent, on-chain governance process.
 
-**Next Step:** Implement the validator registry message handlers (`MsgOnboardValidator`, `MsgRenewValidator`, `MsgOffboardValidator`, `MsgSuspendValidator`) to complete the full integration.
+**Implementation Progress:**
+- ✅ `MsgOnboardValidator` - **COMPLETE** - Fully functional with proto workaround
+- ⏳ `MsgRenewValidator` - Not yet implemented
+- ⏳ `MsgOffboardValidator` - Not yet implemented  
+- ⏳ `MsgSuspendValidator` - Not yet implemented
+
+**Next Steps:** Implement the remaining message handlers and update proto definitions to add proper `operator_address` and `status` fields.
 
 **Documentation Status:** ✅ Complete with all test results, transaction hashes, and real-world examples.
 
