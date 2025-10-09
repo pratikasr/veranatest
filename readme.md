@@ -4,16 +4,25 @@
 ## Features
 
 - **Validator Whitelist**: Only whitelisted validators (stored in KV store) can create validators
-- **Validator Registry Module**: Manages authorized validators via genesis or transactions
+- **Council Governance**: Council-based voting for validator management (2/3 threshold)
+- **Validator Registry Module**: Manages authorized validators via genesis or council proposals
 - **Standard Cosmos SDK Pattern**: Ante handler accesses module keeper for whitelist checks
 
 ## Get started
 
 ### Quick Start with Validator Whitelist
 
-See [README_WHITELIST.md](./README_WHITELIST.md) for complete setup instructions.
+**Initial Setup (Genesis):**
+```bash
+./setup_validator.sh  # Automatically whitelists your validator → Start validating!
+```
 
-**TL;DR**: Add validators to genesis file → Start chain → Whitelisted validators can create validators
+**Documentation:**
+- [VALIDATOR_WHITELIST.md](./VALIDATOR_WHITELIST.md) - Whitelist implementation and testing
+- [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md) - Council setup and governance process
+
+**Adding Validators After Chain Start:**
+Use council governance to vote on new validators (requires 2/3 council approval). See [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md#how-to-add-validators-to-whitelist) for complete guide.
 
 ### Development Mode
 
