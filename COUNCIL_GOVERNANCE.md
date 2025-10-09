@@ -317,6 +317,14 @@ In `app/app_config.go`:
 
 There are two methods to add validators to the whitelist:
 
+**⚠️ Important:** After whitelisting via council governance, you need to **set up and run the validator node**. 
+
+📖 **Complete Node Setup Guide:** [VALIDATOR_NODE_SETUP.md](./VALIDATOR_NODE_SETUP.md)
+- Detailed step-by-step instructions
+- Automated setup script (`setup_validator2.sh`)
+- Port configuration for multiple nodes
+- Troubleshooting guide
+
 ### Method 1: Via Genesis File (Before Chain Start) ✅ TESTED
 
 This method is used when setting up the chain initially or when resetting the chain.

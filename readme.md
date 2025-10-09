@@ -20,9 +20,14 @@
 **Documentation:**
 - [VALIDATOR_WHITELIST.md](./VALIDATOR_WHITELIST.md) - Whitelist implementation and testing
 - [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md) - Council setup and governance process
+- [VALIDATOR_NODE_SETUP.md](./VALIDATOR_NODE_SETUP.md) - Running additional validator nodes
 
 **Adding Validators After Chain Start:**
-Use council governance to vote on new validators (requires 2/3 council approval). See [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md#how-to-add-validators-to-whitelist) for complete guide.
+1. Use council governance to whitelist new validators (requires 2/3 council approval)
+2. Set up and run the validator node
+3. Create validator transaction
+
+See [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md#how-to-add-validators-to-whitelist) for whitelisting and [VALIDATOR_NODE_SETUP.md](./VALIDATOR_NODE_SETUP.md) for node setup.
 
 ### Development Mode
 
