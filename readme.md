@@ -21,6 +21,7 @@
 - [VALIDATOR_WHITELIST.md](./VALIDATOR_WHITELIST.md) - Whitelist implementation and testing
 - [COUNCIL_GOVERNANCE.md](./COUNCIL_GOVERNANCE.md) - Council setup and governance process
 - [VALIDATOR_NODE_SETUP.md](./VALIDATOR_NODE_SETUP.md) - Running additional validator nodes
+- [MODULE_PARAMS_GOVERNANCE.md](./MODULE_PARAMS_GOVERNANCE.md) - Update module parameters via council
 
 **Adding Validators After Chain Start:**
 1. Use council governance to whitelist new validators (requires 2/3 council approval)
