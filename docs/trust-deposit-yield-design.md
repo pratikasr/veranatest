@@ -71,14 +71,13 @@ type Keeper struct {
     // External keepers
     BankKeeper      types.BankKeeper
     AccountKeeper   types.AccountKeeper
-    TrustDepositHub types.TrustDepositLedger // interface to TD share accounting (see note below)
 }
 ```
 
 - `DustAmount` stores sub-micro-unit residues as `LegacyDec` to prevent lost yield.
-- `TrustDepositHub` is an abstraction (e.g. interface in `expected_keepers.go`) exposing methods required to credit the TD ledger, such as `IncreaseYield(ctx, sdk.Coins)` or `MintShares(ctx, sdk.Coins)`. If the yield logic already lives inside the TD keeper, you can satisfy this interface by wiring the keeper itself (and skip introducing a new struct). The goal is simply to make the BeginBlocker invoke whatever mechanism today updates aggregate TD value without duplicating that logic.
+- Share accounting (who owns which portion of TD) is already implemented elsewhere in Verana and operates independently of this feature. The keeper only needs to ensure the module account balance grows; existing TD logic can derive updated share value on demand.
 
-**Justification vs POC:** The current keeper only tracks params/dust and stops after moving coins. Introducing an interface contract makes the dependency on the TD ledger explicit, preventing silent drift when the ledger logic evolves.
+**Justification vs POC:** The current keeper only tracks params/dust and stops after moving coins. Production must still surface the increased balance to TD share accounting, but that can remain encapsulated in existing TD code without a new interface.
 
 ## Messages & Governance
 
@@ -108,8 +107,7 @@ Executed each block after distribution and protocol pool modules:
    - `transferCoins := sdk.NewCoins(sdk.NewCoin(denom, transferInt))`
    - `bankKeeper.SendCoinsFromModuleToModule(ctx, VeranaPoolAccount, types.ModuleName, transferCoins)`
 6. **Credit TD Ledger**:
-   - `k.trustDepositHub.ApplyYield(ctx, transferCoins)` — updates TD total value & share price internally so holders accrue proportionally.
-   - Update `params.TrustDepositTotalValue` if the ledger reports a new TVL.
+   - Ensure the TD module’s existing accounting observes the increased module balance (no new interface required; Verana already exposes share ownership and reacts to balance changes). If the parameters cache `trust_deposit_total_value`, refresh it from the authoritative TD data that already exists.
 7. **Update Dust**:
    - `remaining := totalDec.Sub(decFrom(transferInt))`
    - `k.SetDustAmount(ctx, remaining)`
@@ -119,18 +117,16 @@ Executed each block after distribution and protocol pool modules:
 
 Every step must log context-rich messages for operations observability.
 
-**Justification vs POC:** Steps 3–8 mirror the POC flow but make existing gaps explicit: partial payouts (step 4), ledger credit (step 6), and sweep (step 8) ensure funds do not stall and holders actually benefit.
+**Justification vs POC:** Steps 3–8 mirror the POC flow but make existing gaps explicit: partial payouts (step 4) and sweep (step 8) ensure funds do not stall. Step 6 simply clarifies that existing TD accounting must recognize the balance increase; no additional share logic is specified here.
 
 ## Trust Deposit Ledger Integration
 
 The existing TD ledger already maintains a mapping of accounts to shares:
 
 - **Expectations**: yield injections should increase the pool value without changing individual share counts.
-- **Interface**:
-  - `ApplyYield(ctx, coins sdk.Coins) error` — adds `coins` to pool assets and updates aggregate value used in rate calculations.
-  - `TotalValue(ctx) sdk.Int` — returns canonical TD principal; used to sync `trust_deposit_total_value`.
+- **Interface expectations**: No new methods are required for this feature. Continue to use whatever Verana already exposes to read total TD value (if needed for params) and to maintain share price invariants. If the TD module infers value strictly from its module account balance, no extra plumbing is necessary.
 
-`ApplyYield` should complete atomically to avoid double counting when multiple blocks deliver funds.
+Share ownership is a separate concern, already solved in Verana. This specification assumes that layer continues to function once additional funds reach the TD module account.
 
 ## Admin Flow
 
@@ -143,7 +139,7 @@ The existing TD ledger already maintains a mapping of accounts to shares:
      - `blocks_per_year`
      - (Optionally) `verana_pool_address`
 3. **TD Ledger Alignment**
-   - Operators ensure the TD ledger module exposes the `TrustDepositHub` interface and that the `trust_deposit_total_value` parameter mirrors actual TVL (can be updated automatically during `ApplyYield`).
+   - Ensure operational runbooks make it clear how total TD value is measured today (module account balance vs. dedicated keeper state). If the value is cached in params for rate calculations, schedule periodic syncs from the trusted TD source.
 4. **Monitoring**
    - Dashboard/CLI queries reference new endpoints:
      - `QueryParams` — verify configuration.
@@ -173,7 +169,7 @@ By crediting the TD ledger, individual holders accrue yield proportionally witho
 | Funds stranded in intermediate pool | Post-transfer sweep back to community pool. |
 | Parameter validation empty | Implement strict validators (non-negative, rate bounds, etc.). |
 | Unlimited `MsgFundModule` targets | Enforce allowlist and update `trust_deposit_total_value` only when TD is funded via ledger API. |
-| Missing ledger integration | Call `ApplyYield` or equivalent to ensure share-based accrual. |
+| Missing ledger integration | Document how existing TD accounting observes balances; no new interfaces are required, just ensure value tracking matches expectations. |
 | FundModule workaround | Keep the existing workaround comment and logic until the upstream SDK bug is resolved; document its purpose for reviewers. |
 
 ## Testing Guidelines
