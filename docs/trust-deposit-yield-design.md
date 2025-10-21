@@ -4,6 +4,17 @@
 
 This document specifies how to extend the Verana chain to fund, accrue, and distribute Trust Deposit (TD) yield sourced from protocol rewards. It draws on the `veranatest` proof of concept while generalizing the design for production. Developers should use this specification when implementing or reviewing the feature; it deliberately omits low-level scaffolding details.
 
+## Existing POC Behavior (Reference)
+
+The POC (`veranatest`) implements the minimum viable flow:
+
+- Governance (or any account) can send funds into the Verana Pool account via `MsgCreateContinuousFund` or `MsgFundModule`.
+- The TD `BeginBlocker` calculates a per-block allowance from static params and, when enough dust accumulates, transfers coins from the Verana Pool module account straight into the TD module account (`x/td/keeper/abci.go`).
+- `MsgFundModule` exists primarily to work around [cosmos/cosmos-sdk#25315](https://github.com/cosmos/cosmos-sdk/issues/25315) by seeding module accounts and—in the TD case—incrementing `trust_deposit_value`.
+- No further bookkeeping happens after the transfer: the TD ledger is not updated, addresses/denom are hard-coded, and excess funds remain in the Verana Pool until the next sweep.
+
+This document layers production expectations on top of that baseline; each enhancement below lists its reasoning to make review easier.
+
 ## Goals & Non‑Goals
 
 - **Goals**
@@ -47,6 +58,8 @@ Extend the TD module parameters to include:
 | `blocks_per_year` | `uint32` or `sdk.Int` | Chain-specific estimate used when converting annual rate into per-block allowances. |
 | `verana_pool_address` | `string` | Bech32 string for the Verana Pool module account (default: module addr derived from name). |
 
+**Justification vs POC:** The POC stores only share value, total value, and rate, with no validation or address configurability. Production requires configurable block cadence (networks may tune it), validated financial caps, and removal of hard-coded addresses to avoid runtime breakage.
+
 Parameter validation must enforce non-negative amounts, rate ≤ 1, and a non-zero block count.
 
 ## Keeper State
@@ -58,18 +71,22 @@ type Keeper struct {
     // External keepers
     BankKeeper      types.BankKeeper
     AccountKeeper   types.AccountKeeper
-    TrustDepositHub types.TrustDepositLedger // interface to existing TD share accounting
+    TrustDepositHub types.TrustDepositLedger // interface to TD share accounting (see note below)
 }
 ```
 
 - `DustAmount` stores sub-micro-unit residues as `LegacyDec` to prevent lost yield.
-- `TrustDepositHub` is an abstraction (e.g. interface in `expected_keepers.go`) exposing methods required to credit the TD ledger, such as `IncreaseYield(ctx, sdk.Coins)` or `MintShares(ctx, sdk.Coins)`.
+- `TrustDepositHub` is an abstraction (e.g. interface in `expected_keepers.go`) exposing methods required to credit the TD ledger, such as `IncreaseYield(ctx, sdk.Coins)` or `MintShares(ctx, sdk.Coins)`. If the yield logic already lives inside the TD keeper, you can satisfy this interface by wiring the keeper itself (and skip introducing a new struct). The goal is simply to make the BeginBlocker invoke whatever mechanism today updates aggregate TD value without duplicating that logic.
+
+**Justification vs POC:** The current keeper only tracks params/dust and stops after moving coins. Introducing an interface contract makes the dependency on the TD ledger explicit, preventing silent drift when the ledger logic evolves.
 
 ## Messages & Governance
 
 1. **`MsgFundModule`** (unchanged): allows manual funding of module accounts. Wrap with an allowlist so only recognized modules (`td`, `verana_pool`) can be targets, and align behavior with parameter/state updates (e.g. refresh `trust_deposit_total_value` if TD is funded).
 2. **`MsgUpdateParams`**: governance-authorized update covering all parameters. Enforce that partial updates are validated and maintain invariants.
 3. **`MsgCreateContinuousFund`** (protocol pool module, existing): Governance proposal instructing `x/protocolpool` to remit a percentage of community tax each block to the Verana Pool account. Document the expected set-up for operators (see Admin Flow).
+
+**Justification vs POC:** Messages remain the same, but the allowlist/validation guidance prevents misuse (POC accepts any module target and lacks invariant checks).
 
 ## Begin Block Flow (`x/td`)
 
@@ -101,6 +118,8 @@ Executed each block after distribution and protocol pool modules:
    - If non-zero, send residual back to community/protocol pool account (module-to-module transfer) to keep the buffer empty.
 
 Every step must log context-rich messages for operations observability.
+
+**Justification vs POC:** Steps 3–8 mirror the POC flow but make existing gaps explicit: partial payouts (step 4), ledger credit (step 6), and sweep (step 8) ensure funds do not stall and holders actually benefit.
 
 ## Trust Deposit Ledger Integration
 
@@ -155,6 +174,7 @@ By crediting the TD ledger, individual holders accrue yield proportionally witho
 | Parameter validation empty | Implement strict validators (non-negative, rate bounds, etc.). |
 | Unlimited `MsgFundModule` targets | Enforce allowlist and update `trust_deposit_total_value` only when TD is funded via ledger API. |
 | Missing ledger integration | Call `ApplyYield` or equivalent to ensure share-based accrual. |
+| FundModule workaround | Keep the existing workaround comment and logic until the upstream SDK bug is resolved; document its purpose for reviewers. |
 
 ## Testing Guidelines
 
