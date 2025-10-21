@@ -12,9 +12,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 )
 
-// NewAnteHandler returns an AnteHandler that includes validator whitelist checking
+// NewAnteHandler returns an AnteHandler that includes validator whitelist checking and group proposal timing
 // It follows the standard Cosmos SDK pattern of injecting module keepers as dependencies
 func NewAnteHandler(
 	accountKeeper authkeeper.AccountKeeper,
@@ -22,6 +23,7 @@ func NewAnteHandler(
 	signModeHandler *txsigning.HandlerMap,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	validatorRegistryKeeper validatorregistrykeeper.Keeper,
+	groupKeeper groupkeeper.Keeper,
 ) (sdk.AnteHandler, error) {
 
 	if bankKeeper == nil {
@@ -36,6 +38,9 @@ func NewAnteHandler(
 		ante.NewSetUpContextDecorator(),
 		ante.NewValidateBasicDecorator(),
 
+		// Group proposal timing check - ensures proposals are executed only after voting period ends
+		NewGroupProposalTimingDecorator(groupKeeper),
+
 		// Validator whitelist check - uses validatorregistry keeper to check KV store
 		NewValidatorWhitelistDecorator(validatorRegistryKeeper),
 
@@ -44,6 +49,6 @@ func NewAnteHandler(
 		ante.NewIncrementSequenceDecorator(accountKeeper),
 	}
 
-	log.Printf("DEBUG: Successfully created ante decorators with validator whitelist")
+	log.Printf("DEBUG: Successfully created ante decorators with validator whitelist and group proposal timing")
 	return sdk.ChainAnteDecorators(anteDecorators...), nil
 }

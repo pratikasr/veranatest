@@ -42,6 +42,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
+	groupkeeper "github.com/cosmos/cosmos-sdk/x/group/keeper"
 	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -97,6 +98,7 @@ type App struct {
 	CircuitBreakerKeeper  circuitkeeper.Keeper
 	ParamsKeeper          paramskeeper.Keeper
 	ProtocolPoolKeeper    protocolpoolkeeper.Keeper
+	GroupKeeper           groupkeeper.Keeper
 
 	// ibc keepers
 	IBCKeeper           *ibckeeper.Keeper
@@ -187,6 +189,7 @@ func New(
 		&app.CircuitBreakerKeeper,
 		&app.ParamsKeeper,
 		&app.ProtocolPoolKeeper,
+		&app.GroupKeeper,
 		&app.TdKeeper,
 		&app.ValidatorregistryKeeper,
 	); err != nil {
@@ -200,14 +203,16 @@ func New(
 	// build app
 	app.App = appBuilder.Build(db, traceStore, baseAppOptions...)
 
-	// Create ante handler with validator whitelist check
+	// Create ante handler with validator whitelist check and group proposal timing
 	// Pass validatorregistry keeper to enable KV store access for whitelist checking
+	// Pass group keeper to enable proposal timing validation
 	anteHandler, err := appante.NewAnteHandler(
 		app.AuthKeeper,
 		app.BankKeeper,
 		app.txConfig.SignModeHandler(),
 		ante.DefaultSigVerificationGasConsumer,
 		app.ValidatorregistryKeeper,
+		app.GroupKeeper,
 	)
 	if err != nil {
 		fmt.Printf("ERROR: Failed to create ante handler: %v", err)
