@@ -81,7 +81,7 @@ type Keeper struct {
 
 ## Messages & Governance
 
-1. **`MsgFundModule`** (unchanged): allows manual funding of module accounts. Wrap with an allowlist so only recognized modules (`td`, `verana_pool`) can be targets, and align behavior with parameter/state updates (e.g. refresh `trust_deposit_total_value` if TD is funded).
+1. **`MsgFundModule`** (unchanged signature): allows manual funding of module accounts. Require the caller to match the module authority (defaults to the governance module account) so only authorized operations can seed TD funds. Still wrap with an allowlist so only recognized modules (`td`, `verana_pool`) can be targets, and align behavior with parameter/state updates (e.g. refresh `trust_deposit_total_value` if TD is funded).
 2. **`MsgUpdateParams`**: governance-authorized update covering all parameters. Enforce that partial updates are validated and maintain invariants.
 3. **`MsgCreateContinuousFund`** (protocol pool module, existing): Governance proposal instructing `x/protocolpool` to remit a percentage of community tax each block to the Verana Pool account. Document the expected set-up for operators (see Admin Flow).
 
